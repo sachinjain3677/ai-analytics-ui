@@ -12,8 +12,9 @@ const Home = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
+  const [resetToken, setResetToken] = useState(0);
 
-  const handleQuerySubmit = async (query, file) => {
+  const handleQuerySubmit = async (query) => {
     setIsSubmitting(true);
 
     try {
@@ -21,10 +22,10 @@ const Home = () => {
       const newResults = [];
 
       // File upload is a context-setting step, so it happens first.
-      if (file) {
-        console.log('Uploading file context...', file.name);
+      if (uploadedFile) {
+        console.log('Uploading file context...', uploadedFile.name);
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', uploadedFile);
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log('File context uploaded successfully (simulated).');
       }
@@ -102,9 +103,14 @@ const Home = () => {
 
   const handleReset = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/reset`);
+      // DUMMY RESET: Replace with your actual endpoint call
+      // await axios.post(`${API_BASE_URL}/reset_db`);
+      console.log('Resetting DB tables (simulated).');
+
       setResults([]);
       setUploadedFile(null);
+      setRecordedAudio(null);
+      setResetToken(prev => prev + 1); // Trigger the reset in the ChatBox
     } catch (error) {
       console.error('Error resetting session:', error);
     }
@@ -121,7 +127,7 @@ const Home = () => {
 
       <main className="flex-grow flex flex-col">
         <div className="flex items-center mb-8">
-          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} />
+          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
           <UploadButton onFileSelect={handleFileSelect} />
         </div>
         <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
@@ -131,7 +137,7 @@ const Home = () => {
 
       <footer className="flex justify-end mt-8">
         <button onClick={handleReset} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          RESET
+          RESET ANALYSIS
         </button>
       </footer>
     </div>
