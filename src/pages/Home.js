@@ -23,23 +23,25 @@ const Home = () => {
 
         // DUMMY FILE UPLOAD: Replace with your actual endpoint call
         // const uploadResponse = await axios.post(`${API_BASE_URL}/upload_csv`, formData);
-        // console.log('File upload successful:', uploadResponse.data);
         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
         console.log('File upload successful (simulated).');
       }
 
-      // Step 2: Send the natural language query.
-      console.log('Step 2: Sending query...', query);
-      // DUMMY QUERY SUBMISSION: Replace with your actual endpoint call
-      // const queryResponse = await axios.post(`${API_BASE_URL}/query`, { query });
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      const dummyResponse = {
-        image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
-        insight: `This is a dummy insight for the query: "${query}"`,
-      };
+      // Step 2: Send the natural language query ONLY if the text box is not empty.
+      if (query.trim()) {
+        console.log('Step 2: Sending query...', query);
+        // DUMMY QUERY SUBMISSION: Replace with your actual endpoint call
+        // const queryResponse = await axios.post(`${API_BASE_URL}/query`, { query });
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+        const dummyResponse = {
+          image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
+          insight: `This is a dummy insight for the query: "${query}"`,
+        };
+        setResults(prevResults => [...prevResults, dummyResponse]);
+      }
 
-      setResults(prevResults => [...prevResults, dummyResponse]);
-      setUploadedFile(null); // Clear the file after successful submission
+      // Clear the file after the submission process is complete.
+      setUploadedFile(null);
 
     } catch (error) {
       console.error('An error occurred during submission:', error);
