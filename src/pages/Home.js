@@ -8,31 +8,23 @@ const API_BASE_URL = 'http://localhost:8000'; // Your FastAPI backend URL
 
 const Home = () => {
   const [results, setResults] = useState([]);
-  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-  const handleQuerySubmit = async (query) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/query`, { query });
-      setResults(prevResults => [...prevResults, response.data]);
-    } catch (error) {
-      console.error('Error submitting query:', error);
-    }
+  const handleQuerySubmit = async (query, file) => {
+    console.log('Submitting query:', query);
+    console.log('Submitting file:', file);
+
+    // Dummy endpoint logic
+    const dummyResponse = {
+      image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
+      insight: `This is a dummy insight for the query: "${query}"`,
+    };
+
+    setResults(prevResults => [...prevResults, dummyResponse]);
   };
 
-  const handleFileSelect = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      await axios.post(`${API_BASE_URL}/upload_csv`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setUploadedFileName(file.name);
-    } catch (error) {
-      console.error('Error uploading file:', error);
-    }
+  const handleFileSelect = (file) => {
+    setUploadedFile(file);
   };
 
   const handleExport = async () => {
@@ -54,7 +46,7 @@ const Home = () => {
     try {
       await axios.post(`${API_BASE_URL}/reset`);
       setResults([]);
-      setUploadedFileName('');
+      setUploadedFile(null);
     } catch (error) {
       console.error('Error resetting session:', error);
     }
@@ -71,10 +63,10 @@ const Home = () => {
 
       <main className="flex-grow flex flex-col">
         <div className="flex items-center mb-8">
-          <ChatBox onQuerySubmit={handleQuerySubmit} />
+          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} />
           <UploadButton onFileSelect={handleFileSelect} />
         </div>
-        {uploadedFileName && <p className="mb-4 text-gray-400">Uploaded: {uploadedFileName}</p>}
+        {uploadedFile && <p className="mb-4 text-gray-400">Uploaded: {uploadedFile.name}</p>}
         <ResultCarousel results={results} />
       </main>
 

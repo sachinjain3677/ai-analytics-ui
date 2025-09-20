@@ -20,7 +20,7 @@ const ResultCarousel = ({ results }) => {
       <button onClick={() => scroll('left')} className="absolute left-0 z-10 p-2 bg-gray-800 rounded-full shadow-md hover:bg-gray-700">
         <ChevronLeftIcon />
       </button>
-      <div ref={scrollContainerRef} className="flex overflow-x-auto scroll-smooth scrollbar-hide py-4">
+      <div ref={scrollContainerRef} className="flex overflow-x-auto scroll-smooth custom-scrollbar py-4">
         {results && results.map((result, index) => (
           <ResultCard key={index} imageUrl={result.image_url} insight={result.insight} />
         ))}
