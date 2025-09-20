@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Stars } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { FiArrowRight } from "react-icons/fi";
+import {
+  useMotionTemplate,
+  useMotionValue,
+  motion,
+  animate,
+} from "framer-motion";
+
 import ChatBox from '../components/ChatBox';
 import UploadButton from '../components/UploadButton';
 import ResultCarousel from '../components/ResultCarousel';
 import { AIVoiceInput } from '../components/ui/ai-voice-input';
 
-const API_BASE_URL = 'http://localhost:8000'; // Your FastAPI backend URL
+const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
+const API_BASE_URL = 'http://localhost:8000';
 
 const Home = () => {
   const [results, setResults] = useState([]);
@@ -14,14 +25,27 @@ const Home = () => {
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [resetToken, setResetToken] = useState(0);
 
+  const color = useMotionValue(COLORS_TOP[0]);
+
+  useEffect(() => {
+    animate(color, COLORS_TOP, {
+      ease: "easeInOut",
+      duration: 10,
+      repeat: Infinity,
+      repeatType: "mirror",
+    });
+  }, [color]);
+
+  const backgroundImage = useMotionTemplate`radial-gradient(125% 125% at 50% 0%, #020617 50%, ${color})`;
+  const border = useMotionTemplate`1px solid ${color}`;
+  const boxShadow = useMotionTemplate`0px 4px 24px ${color}`;
+
   const handleQuerySubmit = async (query) => {
     setIsSubmitting(true);
-
     try {
       const audioToSubmit = recordedAudio;
       const newResults = [];
 
-      // File upload is a context-setting step, so it happens first.
       if (uploadedFile) {
         console.log('Uploading file context...', uploadedFile.name);
         const formData = new FormData();
@@ -30,11 +54,10 @@ const Home = () => {
         console.log('File context uploaded successfully (simulated).');
       }
 
-      // Process audio and text queries independently.
       const audioQueryPromise = async () => {
         if (audioToSubmit) {
           console.log('Sending audio query...', audioToSubmit);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
           return {
             image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
             insight: 'This is a dummy insight from the recorded audio.',
@@ -46,7 +69,7 @@ const Home = () => {
       const textQueryPromise = async () => {
         if (query.trim()) {
           console.log('Sending text query...', query);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
           return {
             image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
             insight: `This is a dummy insight for the query: "${query}"`,
@@ -55,10 +78,7 @@ const Home = () => {
         return null;
       };
 
-      const [audioResult, textResult] = await Promise.all([
-        audioQueryPromise(),
-        textQueryPromise(),
-      ]);
+      const [audioResult, textResult] = await Promise.all([audioQueryPromise(), textQueryPromise()]);
 
       if (audioResult) newResults.push(audioResult);
       if (textResult) newResults.push(textResult);
@@ -66,11 +86,9 @@ const Home = () => {
       if (newResults.length > 0) {
         setResults(prevResults => [...prevResults, ...newResults]);
       }
-
     } catch (error) {
       console.error('An error occurred during submission:', error);
     } finally {
-      // Clear all inputs after submission
       setUploadedFile(null);
       setRecordedAudio(null);
       setIsSubmitting(false);
@@ -87,60 +105,68 @@ const Home = () => {
   };
 
   const handleExport = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/export`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'report.pdf'); // or 'report.csv'
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Error exporting report:', error);
-    }
+    // This is a dummy implementation
+    console.log("Exporting report...");
   };
 
   const handleReset = async () => {
-    try {
-      // DUMMY RESET: Replace with your actual endpoint call
-      // await axios.post(`${API_BASE_URL}/reset_db`);
-      console.log('Resetting DB tables (simulated).');
-
-      setResults([]);
-      setUploadedFile(null);
-      setRecordedAudio(null);
-      setResetToken(prev => prev + 1); // Trigger the reset in the ChatBox
-    } catch (error) {
-      console.error('Error resetting session:', error);
-    }
+    console.log('Resetting session (simulated).');
+    setResults([]);
+    setUploadedFile(null);
+    setRecordedAudio(null);
+    setResetToken(prev => prev + 1);
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white p-8 flex flex-col">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">AI-BI</h1>
-        <button onClick={handleExport} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          EXPORT
-        </button>
-      </header>
-
-      <main className="flex-grow flex flex-col">
-        <div className="flex items-center mb-8">
-          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
-          <UploadButton onFileSelect={handleFileSelect} />
+    <motion.section
+      style={{ backgroundImage }}
+      className="relative grid min-h-screen place-content-center overflow-hidden bg-gray-950 px-4 py-24 text-gray-200"
+    >
+      <div className="relative z-10 flex flex-col items-center w-full max-w-5xl mx-auto">
+        <h1 className="max-w-3xl bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-medium leading-tight text-transparent sm:text-5xl sm:leading-tight md:text-7xl md:leading-tight">
+          Your Personal AI-BI Tool
+        </h1>
+        <p className="my-6 max-w-xl text-center text-base leading-relaxed md:text-lg md:leading-relaxed">
+          Upload a CSV, record your voice, or type a query to get instant insights and visualizations.
+        </p>
+        
+        <div className="w-full mt-8">
+          <div className="flex items-center mb-4 w-full">
+            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
+            <UploadButton onFileSelect={handleFileSelect} />
+          </div>
+          <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
+          <ResultCarousel results={results} />
         </div>
-        <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
-        {uploadedFile && <p className="mb-4 text-gray-400">Uploaded: {uploadedFile.name}</p>}
-        <ResultCarousel results={results} />
-      </main>
 
-      <footer className="flex justify-end mt-8">
-        <button onClick={handleReset} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          RESET ANALYSIS
-        </button>
-      </footer>
-    </div>
+        <div className="flex items-center gap-4 mt-8">
+          <motion.button
+            onClick={handleExport}
+            style={{ border, boxShadow }}
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-950/10 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-950/50"
+          >
+            EXPORT
+          </motion.button>
+          <motion.button
+            onClick={handleReset}
+            style={{ border, boxShadow }}
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-red-950/20 px-4 py-2 text-gray-50 transition-colors hover:bg-red-950/50"
+          >
+            RESET ANALYSIS
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="absolute inset-0 z-0">
+        <Canvas>
+          <Stars radius={50} count={2500} factor={4} fade speed={2} />
+        </Canvas>
+      </div>
+    </motion.section>
   );
 };
 
