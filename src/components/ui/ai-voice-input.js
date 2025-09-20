@@ -1,21 +1,24 @@
 "use client";
 
 import { Mic } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
 
 export function AIVoiceInput({
   onStart,
   onStop,
+  onAudioSubmit,
   visualizerBars = 48,
   demoMode = false,
   demoInterval = 3000,
   className
 }) {
-  const [submitted, setSubmitted] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [time, setTime] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [isDemo, setIsDemo] = useState(demoMode);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -23,28 +26,24 @@ export function AIVoiceInput({
 
   useEffect(() => {
     let intervalId;
-
-    if (submitted) {
-      onStart?.();
+    if (isRecording) {
       intervalId = setInterval(() => {
         setTime((t) => t + 1);
       }, 1000);
     } else {
-      onStop?.(time);
       setTime(0);
     }
-
     return () => clearInterval(intervalId);
-  }, [submitted, time, onStart, onStop]);
+  }, [isRecording]);
 
   useEffect(() => {
     if (!isDemo) return;
 
     let timeoutId;
     const runAnimation = () => {
-      setSubmitted(true);
+      setIsRecording(true);
       timeoutId = setTimeout(() => {
-        setSubmitted(false);
+        setIsRecording(false);
         timeoutId = setTimeout(runAnimation, 1000);
       }, demoInterval);
     };
@@ -62,12 +61,46 @@ export function AIVoiceInput({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}` ;
   };
 
+    const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        onAudioSubmit(audioBlob);
+        stream.getTracks().forEach(track => track.stop()); // Stop the microphone access
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      onStart?.();
+    } catch (err) {
+      console.error("Microphone access denied:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      onStop?.(time);
+    }
+  };
+
   const handleClick = () => {
     if (isDemo) {
       setIsDemo(false);
-      setSubmitted(false);
+      setIsRecording(false);
+    } else if (isRecording) {
+      stopRecording();
     } else {
-      setSubmitted((prev) => !prev);
+      startRecording();
     }
   };
 
@@ -77,14 +110,14 @@ export function AIVoiceInput({
         <button
           className={cn(
             "group w-16 h-16 rounded-xl flex items-center justify-center transition-colors",
-            submitted
-              ? "bg-none"
+            isRecording
+              ? "bg-red-500/20"
               : "bg-none hover:bg-black/10 dark:hover:bg-white/10"
           )}
           type="button"
           onClick={handleClick}
         >
-          {submitted ? (
+          {isRecording ? (
             <div
               className="w-6 h-6 rounded-sm animate-spin bg-black dark:bg-white cursor-pointer pointer-events-auto"
               style={{ animationDuration: "3s" }}
@@ -97,7 +130,7 @@ export function AIVoiceInput({
         <span
           className={cn(
             "font-mono text-sm transition-opacity duration-300",
-            submitted
+            isRecording
               ? "text-black/70 dark:text-white/70"
               : "text-black/30 dark:text-white/30"
           )}
@@ -111,12 +144,12 @@ export function AIVoiceInput({
               key={i}
               className={cn(
                 "w-0.5 rounded-full transition-all duration-300",
-                submitted
+                isRecording
                   ? "bg-black/50 dark:bg-white/50 animate-pulse"
                   : "bg-black/10 dark:bg-white/10 h-1"
               )}
               style={
-                submitted && isClient
+                isRecording && isClient
                   ? {
                       height: `${20 + Math.random() * 80}%` ,
                       animationDelay: `${i * 0.05}s` ,
@@ -128,7 +161,7 @@ export function AIVoiceInput({
         </div>
 
         <p className="h-4 text-xs text-black/70 dark:text-white/70">
-          {submitted ? "Listening..." : "Click to speak"}
+          {isRecording ? "Listening..." : "Click to speak"}
         </p>
       </div>
     </div>

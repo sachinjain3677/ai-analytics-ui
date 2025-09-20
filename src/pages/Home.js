@@ -11,48 +11,78 @@ const Home = () => {
   const [results, setResults] = useState([]);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recordedAudio, setRecordedAudio] = useState(null);
 
   const handleQuerySubmit = async (query, file) => {
     setIsSubmitting(true);
 
     try {
-      // Step 1: If a file exists, upload it first.
+      const audioToSubmit = recordedAudio;
+      const newResults = [];
+
+      // File upload is a context-setting step, so it happens first.
       if (file) {
-        console.log('Step 1: Uploading file...', file.name);
+        console.log('Uploading file context...', file.name);
         const formData = new FormData();
         formData.append('file', file);
-
-        // DUMMY FILE UPLOAD: Replace with your actual endpoint call
-        // const uploadResponse = await axios.post(`${API_BASE_URL}/upload_csv`, formData);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-        console.log('File upload successful (simulated).');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('File context uploaded successfully (simulated).');
       }
 
-      // Step 2: Send the natural language query ONLY if the text box is not empty.
-      if (query.trim()) {
-        console.log('Step 2: Sending query...', query);
-        // DUMMY QUERY SUBMISSION: Replace with your actual endpoint call
-        // const queryResponse = await axios.post(`${API_BASE_URL}/query`, { query });
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-        const dummyResponse = {
-          image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
-          insight: `This is a dummy insight for the query: "${query}"`,
-        };
-        setResults(prevResults => [...prevResults, dummyResponse]);
-      }
+      // Process audio and text queries independently.
+      const audioQueryPromise = async () => {
+        if (audioToSubmit) {
+          console.log('Sending audio query...', audioToSubmit);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+          return {
+            image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
+            insight: 'This is a dummy insight from the recorded audio.',
+          };
+        }
+        return null;
+      };
 
-      // Clear the file after the submission process is complete.
-      setUploadedFile(null);
+      const textQueryPromise = async () => {
+        if (query.trim()) {
+          console.log('Sending text query...', query);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+          return {
+            image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
+            insight: `This is a dummy insight for the query: "${query}"`,
+          };
+        }
+        return null;
+      };
+
+      const [audioResult, textResult] = await Promise.all([
+        audioQueryPromise(),
+        textQueryPromise(),
+      ]);
+
+      if (audioResult) newResults.push(audioResult);
+      if (textResult) newResults.push(textResult);
+
+      if (newResults.length > 0) {
+        setResults(prevResults => [...prevResults, ...newResults]);
+      }
 
     } catch (error) {
       console.error('An error occurred during submission:', error);
     } finally {
+      // Clear all inputs after submission
+      setUploadedFile(null);
+      setRecordedAudio(null);
       setIsSubmitting(false);
     }
   };
 
   const handleFileSelect = (file) => {
     setUploadedFile(file);
+  };
+
+  const handleAudioSubmit = (audioBlob) => {
+    setRecordedAudio(audioBlob);
+    console.log("Audio recorded:", audioBlob);
   };
 
   const handleExport = async () => {
@@ -91,10 +121,10 @@ const Home = () => {
 
       <main className="flex-grow flex flex-col">
         <div className="flex items-center mb-8">
-          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} isSubmitting={isSubmitting} />
+          <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} />
           <UploadButton onFileSelect={handleFileSelect} />
         </div>
-        <AIVoiceInput onStart={() => console.log('Recording started')} onStop={(duration) => console.log(`Recording stopped after ${duration}s`)} />
+        <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
         {uploadedFile && <p className="mb-4 text-gray-400">Uploaded: {uploadedFile.name}</p>}
         <ResultCarousel results={results} />
       </main>
