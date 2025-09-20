@@ -14,6 +14,7 @@ import ChatBox from '../components/ChatBox';
 import UploadButton from '../components/UploadButton';
 import ResultCarousel from '../components/ResultCarousel';
 import { AIVoiceInput } from '../components/ui/ai-voice-input';
+import AttachmentPill from '../components/AttachmentPill';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 const API_BASE_URL = 'http://localhost:8000';
@@ -104,6 +105,14 @@ const Home = () => {
     console.log("Audio recorded:", audioBlob);
   };
 
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+  };
+
+  const handleRemoveAudio = () => {
+    setRecordedAudio(null);
+  };
+
   const handleExport = async () => {
     // This is a dummy implementation
     console.log("Exporting report...");
@@ -136,6 +145,24 @@ const Home = () => {
             <UploadButton onFileSelect={handleFileSelect} />
           </div>
           <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
+
+          <div className="flex items-center justify-center gap-4 my-4 h-10">
+            {uploadedFile && (
+              <AttachmentPill 
+                icon="📎" 
+                text={uploadedFile.name} 
+                onRemove={handleRemoveFile} 
+              />
+            )}
+            {recordedAudio && (
+              <AttachmentPill 
+                icon="🎤" 
+                text="Recorded Audio" 
+                onRemove={handleRemoveAudio} 
+              />
+            )}
+          </div>
+
           <ResultCarousel results={results} />
         </div>
 
