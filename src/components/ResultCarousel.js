@@ -28,19 +28,18 @@ const ResultCarousel = ({ results }) => {
   };
 
   return (
-    <div className="flex items-center w-full max-w-[1800px] mx-auto">
+    <div className="flex items-center w-full">
       <motion.button 
         onClick={() => scroll('left')} 
         whileHover={{ scale: 1.015 }}
         whileTap={{ scale: 0.985 }}
-        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 mr-20 flex-shrink-0 transition-colors"
+        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 mr-4 flex-shrink-0 transition-colors"
       >
         <ChevronLeftIcon />
       </motion.button>
       <div 
         ref={scrollContainerRef} 
         className="overflow-x-auto scroll-smooth custom-scrollbar py-4"
-        style={{ width: '1500px' }}
       >
         <div className="flex space-x-4">
           {results && results.map((result, index) => (
@@ -52,7 +51,7 @@ const ResultCarousel = ({ results }) => {
         onClick={() => scroll('right')} 
         whileHover={{ scale: 1.015 }}
         whileTap={{ scale: 0.985 }}
-        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 ml-20 flex-shrink-0 transition-colors"
+        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 ml-4 flex-shrink-0 transition-colors"
       >
         <ChevronRightIcon />
       </motion.button>

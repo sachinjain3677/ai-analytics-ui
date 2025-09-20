@@ -135,7 +135,7 @@ const Home = () => {
       style={{ backgroundImage }}
       className="relative grid min-h-screen place-content-center overflow-hidden bg-gray-950 px-4 py-24 text-gray-200"
     >
-      <div className="relative z-10 flex flex-col items-center w-full max-w-[1800px] mx-auto">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="max-w-3xl bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-medium leading-tight text-transparent sm:text-5xl sm:leading-tight md:text-7xl md:leading-tight">
           Your Personal AI-BI Tool
         </h1>
@@ -144,7 +144,7 @@ const Home = () => {
         </p>
         
         <div className="w-full mt-8">
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center w-full mb-4">
             <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} border={border} boxShadow={boxShadow} />
             <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} />
           </div>
