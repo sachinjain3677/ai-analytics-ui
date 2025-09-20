@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { motion } from 'framer-motion';
 import ResultCard from './ResultCard';
 
 // Placeholder for Left and Right arrow icons
@@ -28,9 +29,14 @@ const ResultCarousel = ({ results }) => {
 
   return (
     <div className="flex items-center w-full max-w-7xl mx-auto">
-      <button onClick={() => scroll('left')} className="p-2 rounded-full shadow-md bg-gray-800/50 hover:bg-gray-700/50 mr-8 flex-shrink-0">
+      <motion.button 
+        onClick={() => scroll('left')} 
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.985 }}
+        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 mr-8 flex-shrink-0 transition-colors"
+      >
         <ChevronLeftIcon />
-      </button>
+      </motion.button>
       <div 
         ref={scrollContainerRef} 
         className="overflow-x-auto scroll-smooth custom-scrollbar py-4"
@@ -42,9 +48,14 @@ const ResultCarousel = ({ results }) => {
           ))}
         </div>
       </div>
-      <button onClick={() => scroll('right')} className="p-2 rounded-full shadow-md bg-gray-800/50 hover:bg-gray-700/50 ml-8 flex-shrink-0">
+      <motion.button 
+        onClick={() => scroll('right')} 
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.985 }}
+        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 ml-8 flex-shrink-0 transition-colors"
+      >
         <ChevronRightIcon />
-      </button>
+      </motion.button>
     </div>
   );
 };

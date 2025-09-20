@@ -145,8 +145,8 @@ const Home = () => {
         
         <div className="w-full mt-8">
           <div className="flex items-center mb-4 w-full">
-            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
-            <UploadButton onFileSelect={handleFileSelect} />
+            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} border={border} boxShadow={boxShadow} />
+            <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} />
           </div>
           <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
 
@@ -156,14 +156,14 @@ const Home = () => {
                 key={file.name}
                 icon="📎" 
                 text={file.name} 
-                onRemove={() => handleRemoveFile(file.name)} 
+                onRemove={() => handleRemoveFile(file.name)}
               />
             ))}
             {recordedAudio && (
               <AttachmentPill 
                 icon="🎤" 
                 text="Recorded Audio" 
-                onRemove={handleRemoveAudio} 
+                onRemove={handleRemoveAudio}
               />
             )}
           </div>
@@ -174,19 +174,17 @@ const Home = () => {
         <div className="flex items-center gap-4 mt-8">
           <motion.button
             onClick={handleExport}
-            style={{ border, boxShadow }}
             whileHover={{ scale: 1.015 }}
             whileTap={{ scale: 0.985 }}
-            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-950/10 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-950/50"
+            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/60 border border-gray-600/50 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-800/80"
           >
             EXPORT
           </motion.button>
           <motion.button
             onClick={handleReset}
-            style={{ border, boxShadow }}
             whileHover={{ scale: 1.015 }}
             whileTap={{ scale: 0.985 }}
-            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-red-950/20 px-4 py-2 text-gray-50 transition-colors hover:bg-red-950/50"
+            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-red-900/60 border border-red-700/50 px-4 py-2 text-gray-50 transition-colors hover:bg-red-900/80"
           >
             RESET ANALYSIS
           </motion.button>
