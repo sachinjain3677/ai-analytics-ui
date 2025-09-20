@@ -7,9 +7,9 @@ const UploadButton = ({ onFileSelect }) => {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      onFileSelect(file);
+    const files = e.target.files;
+    if (files.length > 0) {
+      onFileSelect(files);
     }
     // Reset the input value to allow re-uploading the same file.
     e.target.value = null;
@@ -23,6 +23,7 @@ const UploadButton = ({ onFileSelect }) => {
         onChange={handleFileChange}
         className="hidden"
         accept=".csv"
+        multiple
       />
       <button
         type="button"

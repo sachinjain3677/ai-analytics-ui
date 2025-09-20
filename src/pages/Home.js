@@ -21,7 +21,7 @@ const API_BASE_URL = 'http://localhost:8000';
 
 const Home = () => {
   const [results, setResults] = useState([]);
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [resetToken, setResetToken] = useState(0);
@@ -47,12 +47,13 @@ const Home = () => {
       const audioToSubmit = recordedAudio;
       const newResults = [];
 
-      if (uploadedFile) {
-        console.log('Uploading file context...', uploadedFile.name);
+      for (const file of uploadedFiles) {
+        console.log(`Uploading file: ${file.name}...`);
         const formData = new FormData();
-        formData.append('file', uploadedFile);
+        formData.append('file', file);
+        // DUMMY FILE UPLOAD
         await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('File context uploaded successfully (simulated).');
+        console.log(`File ${file.name} uploaded successfully (simulated).`);
       }
 
       const audioQueryPromise = async () => {
@@ -90,14 +91,17 @@ const Home = () => {
     } catch (error) {
       console.error('An error occurred during submission:', error);
     } finally {
-      setUploadedFile(null);
+      setUploadedFiles([]);
       setRecordedAudio(null);
       setIsSubmitting(false);
     }
   };
 
-  const handleFileSelect = (file) => {
-    setUploadedFile(file);
+  const handleFileSelect = (newFiles) => {
+    const filesToAdd = Array.from(newFiles).filter(newFile => 
+      !uploadedFiles.some(existingFile => existingFile.name === newFile.name)
+    );
+    setUploadedFiles(prevFiles => [...prevFiles, ...filesToAdd]);
   };
 
   const handleAudioSubmit = (audioBlob) => {
@@ -105,8 +109,8 @@ const Home = () => {
     console.log("Audio recorded:", audioBlob);
   };
 
-  const handleRemoveFile = () => {
-    setUploadedFile(null);
+  const handleRemoveFile = (fileName) => {
+    setUploadedFiles(prevFiles => prevFiles.filter(file => file.name !== fileName));
   };
 
   const handleRemoveAudio = () => {
@@ -121,7 +125,7 @@ const Home = () => {
   const handleReset = async () => {
     console.log('Resetting session (simulated).');
     setResults([]);
-    setUploadedFile(null);
+    setUploadedFiles([]);
     setRecordedAudio(null);
     setResetToken(prev => prev + 1);
   };
@@ -141,19 +145,20 @@ const Home = () => {
         
         <div className="w-full mt-8">
           <div className="flex items-center mb-4 w-full">
-            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
+            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} />
             <UploadButton onFileSelect={handleFileSelect} />
           </div>
           <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
 
           <div className="flex items-center justify-center gap-4 my-4 h-10">
-            {uploadedFile && (
+            {uploadedFiles.map(file => (
               <AttachmentPill 
+                key={file.name}
                 icon="📎" 
-                text={uploadedFile.name} 
-                onRemove={handleRemoveFile} 
+                text={file.name} 
+                onRemove={() => handleRemoveFile(file.name)} 
               />
-            )}
+            ))}
             {recordedAudio && (
               <AttachmentPill 
                 icon="🎤" 
