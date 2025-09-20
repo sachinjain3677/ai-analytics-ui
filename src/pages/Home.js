@@ -126,7 +126,7 @@ const Home = () => {
         <h1 className="max-w-3xl bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-medium leading-tight text-transparent sm:text-5xl sm:leading-tight md:text-7xl md:leading-tight">
           Your Personal AI-BI Tool
         </h1>
-        <p className="my-6 max-w-xl text-center text-base leading-relaxed md:text-lg md:leading-relaxed">
+        <p className="my-6 max-w-2xl text-center text-lg font-medium leading-relaxed md:text-xl md:leading-relaxed lg:text-2xl lg:leading-relaxed text-gray-200">
           Upload a CSV, record your voice, or type a query to get instant insights and visualizations.
         </p>
         

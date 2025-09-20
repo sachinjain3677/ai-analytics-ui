@@ -160,7 +160,7 @@ export function AIVoiceInput({
           ))}
         </div>
 
-        <p className="h-4 text-xs text-black/70 dark:text-white/70">
+        <p className="h-6 text-base font-semibold text-black/80 dark:text-white/80 tracking-wide">
           {isRecording ? "Listening..." : "Click to speak"}
         </p>
       </div>
