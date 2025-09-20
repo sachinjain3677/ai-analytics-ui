@@ -3,6 +3,7 @@ import axios from 'axios';
 import ChatBox from '../components/ChatBox';
 import UploadButton from '../components/UploadButton';
 import ResultCarousel from '../components/ResultCarousel';
+import { AIVoiceInput } from '../components/ui/ai-voice-input';
 
 const API_BASE_URL = 'http://localhost:8000'; // Your FastAPI backend URL
 
@@ -93,6 +94,7 @@ const Home = () => {
           <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFile} isSubmitting={isSubmitting} />
           <UploadButton onFileSelect={handleFileSelect} />
         </div>
+        <AIVoiceInput onStart={() => console.log('Recording started')} onStop={(duration) => console.log(`Recording stopped after ${duration}s`)} />
         {uploadedFile && <p className="mb-4 text-gray-400">Uploaded: {uploadedFile.name}</p>}
         <ResultCarousel results={results} />
       </main>
