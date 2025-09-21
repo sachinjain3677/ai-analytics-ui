@@ -19,6 +19,8 @@ import { GradualSpacing } from '../components/ui/gradual-spacing';
 import { BasicDemo as TextLoopDemo } from '../components/ui/text-loop-demo';
 import AttachmentPill from '../components/AttachmentPill';
 import ResultModal from '../components/ResultModal';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 const API_BASE_URL = 'http://localhost:8000';
@@ -139,8 +141,45 @@ const Home = () => {
   };
 
   const handleExport = async () => {
-    // This is a dummy implementation
-    console.log("Exporting report...");
+    if (results.length === 0) {
+      alert("There are no results to export.");
+      return;
+    }
+
+    console.log("Starting export process...");
+    const zip = new JSZip();
+
+    try {
+      await Promise.all(results.map(async (result, index) => {
+        const folder = zip.folder(`Analysis${index + 1}`);
+        
+        // Add the insight text file
+        folder.file("insight.txt", result.insight);
+
+        // Fetch the image, handle potential CORS issues by routing through a proxy if needed
+        // For picsum.photos, a direct fetch should work.
+        try {
+          const response = await fetch(result.image_url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const imageBlob = await response.blob();
+          folder.file("image.jpeg", imageBlob);
+        } catch (error) {
+          console.error(`Failed to fetch image for Analysis${index + 1}:`, error);
+          folder.file("image_error.txt", `Could not download image from: ${result.image_url}`);
+        }
+      }));
+
+      // Generate the zip file and trigger a download
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      saveAs(zipBlob, "ai-analysis-export.zip");
+      console.log("Export completed successfully.");
+
+    } catch (error) {
+      console.error("An error occurred during the export process:", error);
+      alert("An error occurred while creating the zip file.");
+    }
   };
 
   const handleResultClick = (result) => {
