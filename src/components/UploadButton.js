@@ -1,11 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import FilePopover from './FilePopover';
 
 // Placeholder for Upload icon
 const UploadIcon = () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>;
 
-const UploadButton = ({ onFileSelect, border, boxShadow }) => {
+const UploadButton = ({ onFileSelect, border, boxShadow, uploadedFiles }) => {
   const fileInputRef = useRef(null);
+  const [isPopoverVisible, setIsPopoverVisible] = useState(false);
 
   const handleFileChange = (e) => {
     const files = e.target.files;
@@ -17,7 +19,11 @@ const UploadButton = ({ onFileSelect, border, boxShadow }) => {
   };
 
   return (
-    <>
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsPopoverVisible(true)}
+      onMouseLeave={() => setIsPopoverVisible(false)}
+    >
       <input
         type="file"
         ref={fileInputRef}
@@ -36,7 +42,8 @@ const UploadButton = ({ onFileSelect, border, boxShadow }) => {
       >
         <UploadIcon />
       </motion.button>
-    </>
+      <FilePopover files={uploadedFiles} isVisible={isPopoverVisible} border={border} boxShadow={boxShadow} />
+    </div>
   );
 };
 

@@ -24,6 +24,7 @@ const API_BASE_URL = 'http://localhost:8000';
 const Home = () => {
   const [results, setResults] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [sessionFiles, setSessionFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [resetToken, setResetToken] = useState(0);
@@ -49,13 +50,28 @@ const Home = () => {
       const audioToSubmit = recordedAudio;
       const newResults = [];
 
+      const successfullyUploadedFiles = [];
       for (const file of uploadedFiles) {
-        console.log(`Uploading file: ${file.name}...`);
-        const formData = new FormData();
-        formData.append('file', file);
-        // DUMMY FILE UPLOAD
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log(`File ${file.name} uploaded successfully (simulated).`);
+        try {
+          console.log(`Uploading file: ${file.name}...`);
+          const formData = new FormData();
+          formData.append('file', file);
+          // DUMMY FILE UPLOAD
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log(`File ${file.name} uploaded successfully (simulated).`);
+          successfullyUploadedFiles.push(file);
+        } catch (uploadError) {
+          console.error(`Failed to upload ${file.name}:`, uploadError);
+        }
+      }
+
+      if (successfullyUploadedFiles.length > 0) {
+        setSessionFiles(prevFiles => {
+          const newFiles = successfullyUploadedFiles.filter(
+            newFile => !prevFiles.some(existingFile => existingFile.name === newFile.name)
+          );
+          return [...prevFiles, ...newFiles];
+        });
       }
 
       const audioQueryPromise = async () => {
@@ -128,6 +144,7 @@ const Home = () => {
     console.log('Resetting session (simulated).');
     setResults([]);
     setUploadedFiles([]);
+    setSessionFiles([]);
     setRecordedAudio(null);
     setResetToken(prev => prev + 1);
   };
@@ -149,7 +166,7 @@ const Home = () => {
         <div className="w-full mt-8">
           <div className="flex items-center justify-center w-full max-w-4xl mx-auto mb-4">
             <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} border={border} boxShadow={boxShadow} />
-            <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} />
+            <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} uploadedFiles={sessionFiles} />
           </div>
           <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
           
