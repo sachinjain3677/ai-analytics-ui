@@ -8,6 +8,7 @@ const ChevronRightIcon = () => <svg className="w-8 h-8" fill="none" stroke="curr
 
 const ResultCarousel = ({ results }) => {
   const scrollContainerRef = useRef(null);
+  const showArrows = results && results.length >= 4;
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -28,34 +29,37 @@ const ResultCarousel = ({ results }) => {
   };
 
   return (
-    <div className="flex items-center w-full max-w-[1800px] mx-auto">
-      <motion.button 
-        onClick={() => scroll('left')} 
-        whileHover={{ scale: 1.015 }}
-        whileTap={{ scale: 0.985 }}
-        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 mr-20 flex-shrink-0 transition-colors"
-      >
-        <ChevronLeftIcon />
-      </motion.button>
+    <div className={`flex items-center w-full min-w-[1300px] ${showArrows ? 'justify-between' : 'justify-center'}`}>
+      {showArrows && (
+        <motion.button 
+          onClick={() => scroll('left')} 
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.985 }}
+          className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 mr-4 flex-shrink-0 transition-colors"
+        >
+          <ChevronLeftIcon />
+        </motion.button>
+      )}
       <div 
         ref={scrollContainerRef} 
         className="overflow-x-auto scroll-smooth custom-scrollbar py-4"
-        style={{ width: '1500px' }}
-      >
-        <div className="flex space-x-4">
+              >
+        <div className="flex space-x-4 w-full min-w-[1300px]">
           {results && results.map((result, index) => (
             <ResultCard key={index} imageUrl={result.image_url} insight={result.insight} />
           ))}
         </div>
       </div>
-      <motion.button 
-        onClick={() => scroll('right')} 
-        whileHover={{ scale: 1.015 }}
-        whileTap={{ scale: 0.985 }}
-        className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 ml-20 flex-shrink-0 transition-colors"
-      >
-        <ChevronRightIcon />
-      </motion.button>
+      {showArrows && (
+        <motion.button 
+          onClick={() => scroll('right')} 
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.985 }}
+          className="p-2 rounded-full shadow-md bg-gray-800/60 border border-gray-600/50 hover:bg-gray-800/80 ml-4 flex-shrink-0 transition-colors"
+        >
+          <ChevronRightIcon />
+        </motion.button>
+      )}
     </div>
   );
 };
