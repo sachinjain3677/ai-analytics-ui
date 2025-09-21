@@ -201,12 +201,25 @@ const Home = () => {
   };
 
   const handleReset = async () => {
-    console.log('Resetting session (simulated).');
-    setResults([]);
-    setUploadedFiles([]);
-    setSessionFiles([]);
-    setRecordedAudio(null);
-    setResetToken(prev => prev + 1);
+    try {
+      console.log('Sending reset request to backend...');
+      const response = await axios.post(`${API_BASE_URL}/reset`);
+
+      if (response.status === 200) {
+        console.log('Backend reset successful. Clearing UI.');
+        setResults([]);
+        setUploadedFiles([]);
+        setSessionFiles([]);
+        setRecordedAudio(null);
+        setResetToken(prev => prev + 1);
+      } else {
+        console.error('Backend reset failed with status:', response.status);
+        setToast({ message: 'Failed to reset analysis. Server responded unexpectedly.', type: 'error' });
+      }
+    } catch (error) {
+      console.error('An error occurred during reset:', error);
+      setToast({ message: 'Failed to reset analysis. Please try again.', type: 'error' });
+    }
   };
 
   return (
