@@ -21,6 +21,7 @@ import AttachmentPill from '../components/AttachmentPill';
 import ResultModal from '../components/ResultModal';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import Toast from '../components/Toast';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 const API_BASE_URL = 'http://localhost:8000';
@@ -33,6 +34,7 @@ const Home = () => {
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [resetToken, setResetToken] = useState(0);
   const [selectedResult, setSelectedResult] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   const color = useMotionValue(COLORS_TOP[0]);
 
@@ -57,16 +59,24 @@ const Home = () => {
 
       const successfullyUploadedFiles = [];
       for (const file of uploadedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+
         try {
           console.log(`Uploading file: ${file.name}...`);
-          const formData = new FormData();
-          formData.append('file', file);
-          // DUMMY FILE UPLOAD
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          console.log(`File ${file.name} uploaded successfully (simulated).`);
-          successfullyUploadedFiles.push(file);
+          const response = await axios.post(`${API_BASE_URL}/upload_csv`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+
+          if (response.status === 200) {
+            console.log(`File ${file.name} uploaded successfully.`);
+            successfullyUploadedFiles.push(file);
+          }
         } catch (uploadError) {
           console.error(`Failed to upload ${file.name}:`, uploadError);
+          setToast({ message: `Error uploading ${file.name}. Please try again.`, type: 'error' });
         }
       }
 
@@ -284,6 +294,12 @@ const Home = () => {
         onClose={handleCloseModal} 
         border={border} 
         boxShadow={boxShadow} 
+      />
+
+      <Toast 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => setToast({ message: '', type: '' })} 
       />
     </motion.section>
   );
