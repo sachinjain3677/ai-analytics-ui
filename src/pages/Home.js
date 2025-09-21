@@ -206,7 +206,7 @@ const Home = () => {
     >
       <div className="relative z-10 flex flex-col items-center w-full mx-auto px-4 sm:px-6 lg:px-8 min-w-[1300px]">
         <GradualSpacing
-          className="font-display bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold tracking-tighter text-transparent sm:text-5xl md:text-7xl md:leading-[5rem]"
+          className="font-display bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold text-transparent sm:text-5xl md:text-7xl md:leading-[5rem]"
           text="Your Personal AI-BI Tool"
         />
         <AnimatePresence>
