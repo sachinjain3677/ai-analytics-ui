@@ -25,7 +25,7 @@ const ChatBox = ({ onQuerySubmit, uploadedFile, recordedAudio, isSubmitting, res
       onSubmit={handleSubmit} 
       style={{ border, boxShadow }}
       whileHover={{ scale: 1.002 }}
-      className="flex-grow flex items-center bg-gray-950/20 rounded-lg p-2 mr-4 transition-colors hover:bg-gray-950/30"
+      className="flex items-center bg-gray-950/20 rounded-lg p-2 mr-4 transition-colors hover:bg-gray-950/30 w-[1100px]"
     >
       <div className="relative flex-grow">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
