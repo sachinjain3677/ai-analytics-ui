@@ -15,6 +15,7 @@ import UploadButton from '../components/UploadButton';
 import ResultCarousel from '../components/ResultCarousel';
 import { AIVoiceInput } from '../components/ui/ai-voice-input';
 import { GradualSpacing } from '../components/ui/gradual-spacing';
+import { BasicDemo as TextLoopDemo } from '../components/ui/text-loop-demo';
 import AttachmentPill from '../components/AttachmentPill';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
@@ -141,9 +142,9 @@ const Home = () => {
           className="font-display bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold tracking-tighter text-transparent sm:text-5xl md:text-7xl md:leading-[5rem]"
           text="Your Personal AI-BI Tool"
         />
-        <p className="my-6 max-w-2xl text-center text-lg font-medium leading-relaxed md:text-xl md:leading-relaxed lg:text-2xl lg:leading-relaxed text-gray-200">
-          Upload a CSV, record your voice, or type a query to get instant insights and visualizations.
-        </p>
+        <div className="my-6">
+          <TextLoopDemo />
+        </div>
         
         <div className="w-full mt-8">
           <div className="flex items-center justify-center w-full max-w-4xl mx-auto mb-4">
@@ -151,7 +152,7 @@ const Home = () => {
             <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} />
           </div>
           <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
-
+          
           <div className="flex items-center justify-center gap-4 my-4 h-10">
             {uploadedFiles.map(file => (
               <AttachmentPill 
