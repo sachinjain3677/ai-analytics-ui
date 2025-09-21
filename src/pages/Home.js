@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Stars } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -17,6 +18,7 @@ import { AIVoiceInput } from '../components/ui/ai-voice-input';
 import { GradualSpacing } from '../components/ui/gradual-spacing';
 import { BasicDemo as TextLoopDemo } from '../components/ui/text-loop-demo';
 import AttachmentPill from '../components/AttachmentPill';
+import ResultModal from '../components/ResultModal';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 const API_BASE_URL = 'http://localhost:8000';
@@ -28,6 +30,7 @@ const Home = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [resetToken, setResetToken] = useState(0);
+  const [selectedResult, setSelectedResult] = useState(null);
 
   const color = useMotionValue(COLORS_TOP[0]);
 
@@ -140,6 +143,14 @@ const Home = () => {
     console.log("Exporting report...");
   };
 
+  const handleResultClick = (result) => {
+    setSelectedResult(result);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedResult(null);
+  };
+
   const handleReset = async () => {
     console.log('Resetting session (simulated).');
     setResults([]);
@@ -159,56 +170,68 @@ const Home = () => {
           className="font-display bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold tracking-tighter text-transparent sm:text-5xl md:text-7xl md:leading-[5rem]"
           text="Your Personal AI-BI Tool"
         />
-        <div className="my-6">
-          <TextLoopDemo />
-        </div>
-        
-        <div className="w-full mt-8">
-          <div className="flex items-center justify-center w-full max-w-4xl mx-auto mb-4">
-            <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} border={border} boxShadow={boxShadow} />
-            <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} uploadedFiles={sessionFiles} />
-          </div>
-          <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
-          
-          <div className="flex items-center justify-center gap-4 my-4 h-10">
-            {uploadedFiles.map(file => (
-              <AttachmentPill 
-                key={file.name}
-                icon="📎" 
-                text={file.name} 
-                onRemove={() => handleRemoveFile(file.name)}
-              />
-            ))}
-            {recordedAudio && (
-              <AttachmentPill 
-                icon="🎤" 
-                text="Recorded Audio" 
-                onRemove={handleRemoveAudio}
-              />
-            )}
-          </div>
+        <AnimatePresence>
+          {!selectedResult && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="w-full flex flex-col items-center"
+            >
+              <div className="my-6">
+                <TextLoopDemo />
+              </div>
+              
+              <div className="w-full mt-8">
+                <div className="flex items-center justify-center w-full max-w-4xl mx-auto mb-4">
+                  <ChatBox onQuerySubmit={handleQuerySubmit} uploadedFile={uploadedFiles.length > 0} recordedAudio={recordedAudio} isSubmitting={isSubmitting} resetToken={resetToken} border={border} boxShadow={boxShadow} />
+                  <UploadButton onFileSelect={handleFileSelect} border={border} boxShadow={boxShadow} uploadedFiles={sessionFiles} />
+                </div>
+                <AIVoiceInput onAudioSubmit={handleAudioSubmit} />
+                
+                <div className="flex items-center justify-center gap-4 my-4 h-10">
+                  {uploadedFiles.map(file => (
+                    <AttachmentPill 
+                      key={file.name}
+                      icon="📎" 
+                      text={file.name} 
+                      onRemove={() => handleRemoveFile(file.name)}
+                    />
+                  ))}
+                  {recordedAudio && (
+                    <AttachmentPill 
+                      icon="🎤" 
+                      text="Recorded Audio" 
+                      onRemove={handleRemoveAudio}
+                    />
+                  )}
+                </div>
 
-          <ResultCarousel results={results} />
-        </div>
+                <ResultCarousel results={results} onResultClick={handleResultClick} />
+              </div>
 
-        <div className="flex items-center gap-4 mt-8">
-          <motion.button
-            onClick={handleExport}
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.985 }}
-            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/60 border border-gray-600/50 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-800/80"
-          >
-            EXPORT
-          </motion.button>
-          <motion.button
-            onClick={handleReset}
-            whileHover={{ scale: 1.015 }}
-            whileTap={{ scale: 0.985 }}
-            className="group relative flex w-fit items-center gap-1.5 rounded-full bg-red-900/60 border border-red-700/50 px-4 py-2 text-gray-50 transition-colors hover:bg-red-900/80"
-          >
-            RESET ANALYSIS
-          </motion.button>
-        </div>
+              <div className="flex items-center gap-4 mt-8">
+                <motion.button
+                  onClick={handleExport}
+                  whileHover={{ scale: 1.015 }}
+                  whileTap={{ scale: 0.985 }}
+                  className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/60 border border-gray-600/50 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-800/80"
+                >
+                  EXPORT
+                </motion.button>
+                <motion.button
+                  onClick={handleReset}
+                  whileHover={{ scale: 1.015 }}
+                  whileTap={{ scale: 0.985 }}
+                  className="group relative flex w-fit items-center gap-1.5 rounded-full bg-red-900/60 border border-red-700/50 px-4 py-2 text-gray-50 transition-colors hover:bg-red-900/80"
+                >
+                  RESET ANALYSIS
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="absolute inset-0 z-0">
@@ -216,6 +239,13 @@ const Home = () => {
           <Stars radius={50} count={2500} factor={4} fade speed={2} />
         </Canvas>
       </div>
+
+      <ResultModal 
+        result={selectedResult} 
+        onClose={handleCloseModal} 
+        border={border} 
+        boxShadow={boxShadow} 
+      />
     </motion.section>
   );
 };
