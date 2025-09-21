@@ -14,6 +14,7 @@ import ChatBox from '../components/ChatBox';
 import UploadButton from '../components/UploadButton';
 import ResultCarousel from '../components/ResultCarousel';
 import { AIVoiceInput } from '../components/ui/ai-voice-input';
+import { GradualSpacing } from '../components/ui/gradual-spacing';
 import AttachmentPill from '../components/AttachmentPill';
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
@@ -136,9 +137,10 @@ const Home = () => {
       className="relative grid min-h-screen place-content-center overflow-hidden bg-gray-950 px-4 py-24 text-gray-200"
     >
       <div className="relative z-10 flex flex-col items-center w-full mx-auto px-4 sm:px-6 lg:px-8 min-w-[1300px]">
-        <h1 className="max-w-3xl bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-medium leading-tight text-transparent sm:text-5xl sm:leading-tight md:text-7xl md:leading-tight">
-          Your Personal AI-BI Tool
-        </h1>
+        <GradualSpacing
+          className="font-display bg-gradient-to-br from-white to-gray-400 bg-clip-text text-center text-3xl font-bold tracking-tighter text-transparent sm:text-5xl md:text-7xl md:leading-[5rem]"
+          text="Your Personal AI-BI Tool"
+        />
         <p className="my-6 max-w-2xl text-center text-lg font-medium leading-relaxed md:text-xl md:leading-relaxed lg:text-2xl lg:leading-relaxed text-gray-200">
           Upload a CSV, record your voice, or type a query to get instant insights and visualizations.
         </p>
