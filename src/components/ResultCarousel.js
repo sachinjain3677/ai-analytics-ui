@@ -6,7 +6,7 @@ import ResultCard from './ResultCard';
 const ChevronLeftIcon = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>;
 const ChevronRightIcon = () => <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>;
 
-const ResultCarousel = ({ results, onResultClick }) => {
+const ResultCarousel = ({ results, onResultClick, onDeleteResult }) => {
   const scrollContainerRef = useRef(null);
   const showArrows = results && results.length >= 4;
 
@@ -46,7 +46,7 @@ const ResultCarousel = ({ results, onResultClick }) => {
               >
         <div className="flex space-x-4 w-full min-w-[1300px]">
           {results && results.map((result, index) => (
-            <ResultCard key={index} result={result} onResultClick={onResultClick} />
+            <ResultCard key={index} result={result} onResultClick={onResultClick} onDeleteResult={onDeleteResult} />
           ))}
         </div>
       </div>

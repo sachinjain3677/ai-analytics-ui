@@ -94,6 +94,7 @@ const Home = () => {
           console.log('Sending audio query...', audioToSubmit);
           await new Promise(resolve => setTimeout(resolve, 1000));
           return {
+            id: `audio_${Date.now()}`,
             image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
             insight: 'This is a dummy insight from the recorded audio.',
           };
@@ -112,6 +113,7 @@ const Home = () => {
               const graphData = JSON.parse(response.data.graph);
               const insightData = JSON.parse(response.data.insights);
               return {
+                id: `text_${Date.now()}`,
                 graph: graphData,
                 insight: insightData,
               };
@@ -220,6 +222,10 @@ const Home = () => {
     setSelectedResult(null);
   };
 
+  const handleDeleteResult = (resultId) => {
+    setResults(prevResults => prevResults.filter(result => result.id !== resultId));
+  };
+
   const handleReset = async () => {
     try {
       console.log('Sending reset request to backend...');
@@ -290,7 +296,7 @@ const Home = () => {
                   )}
                 </div>
 
-                <ResultCarousel results={results} onResultClick={handleResultClick} />
+                <ResultCarousel results={results} onResultClick={handleResultClick} onDeleteResult={handleDeleteResult} />
               </div>
 
               <div className="flex items-center gap-4 mt-8">
