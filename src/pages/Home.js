@@ -103,12 +103,32 @@ const Home = () => {
 
       const textQueryPromise = async () => {
         if (query.trim()) {
-          console.log('Sending text query...', query);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return {
-            image_url: `https://picsum.photos/seed/${Math.random()}/400/300`,
-            insight: `This is a dummy insight for the query: "${query}"`,
-          };
+          try {
+            console.log('Sending text query to /generate_sql...', query);
+            const response = await axios.post(`${API_BASE_URL}/generate_sql`, { query });
+
+            if (response.status === 200) {
+              // The backend returns graph and insights as JSON strings that need to be parsed.
+              const graphData = JSON.parse(response.data.graph);
+              const insightData = JSON.parse(response.data.insights);
+              return {
+                graph: graphData,
+                insight: insightData,
+              };
+            }
+            // This part might not be reached if axios throws on non-2xx status, but is good for defense.
+            return null;
+
+          } catch (error) {
+            console.error('Text query failed:', error);
+            const status = error.response ? error.response.status : null;
+            if ([400, 500, 503].includes(status)) {
+              setToast({ message: `An error occurred: ${error.response.data.detail || 'Server error'}`, type: 'error' });
+            } else {
+              setToast({ message: 'An unexpected error occurred. Please try again.', type: 'error' });
+            }
+            return null;
+          }
         }
         return null;
       };

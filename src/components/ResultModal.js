@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Plot from 'react-plotly.js';
 
 const ResultModal = ({ result, onClose, border, boxShadow }) => {
   if (!result) return null;
@@ -22,15 +23,41 @@ const ResultModal = ({ result, onClose, border, boxShadow }) => {
           className="relative bg-gray-950/40 rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden"
           onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
         >
-          <div className="p-2">
-            <img 
-              src={result.image_url} 
-              alt="Insight visualization" 
-              className="w-full h-auto object-cover rounded-xl" 
-            />
+          <div className="p-4 bg-gray-900/50 rounded-t-2xl">
+            {result.graph ? (
+              <Plot
+                data={result.graph.data}
+                layout={{
+                  ...result.graph.layout,
+                  autosize: true,
+                  height: 600, // Taller graph for the modal view
+                  paper_bgcolor: 'rgba(0,0,0,0)',
+                  plot_bgcolor: 'rgba(0,0,0,0)',
+                  font: { color: 'white' },
+                  margin: { l: 50, r: 50, b: 50, t: 80, pad: 4 },
+                }}
+                useResizeHandler={true}
+                className="w-full"
+                config={{ responsive: true, displayModeBar: true }} // Show mode bar in modal
+              />
+            ) : (
+              <img 
+                src={result.image_url} 
+                alt="Insight visualization" 
+                className="w-full h-auto object-cover rounded-xl" 
+              />
+            )}
           </div>
           <div className="p-6 pt-4 text-center">
-            <p className="text-gray-300 text-lg">{result.insight}</p>
+            {typeof result.insight === 'object' && result.insight.insights ? (
+              <ul className="text-gray-300 text-lg list-disc list-inside space-y-2 text-left">
+                {result.insight.insights.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-300 text-lg">{result.insight}</p>
+            )}
           </div>
         </motion.div>
       </motion.div>
